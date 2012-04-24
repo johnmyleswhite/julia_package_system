@@ -13,8 +13,19 @@ end
 
 create_package() # Check that this produces expected files.
 
+function check_package()
+  # Check that package in current directory contains all required files.
+end
+
+check_package()
+
+function test_package(package_name)
+  # Run all tests in a package.
+end
+
+test_package("stats.jl")
+
 function update_packages()
-  # NO-OP
   # Should download new copy of packages.csv
 end
 
@@ -28,7 +39,7 @@ available_packages() # Returns a 2x2 array.
 
 function installed_packages()
   package_directory = path_expand("~/.julia/packages")
-  map(chomp, readlines(`ls $package_directory`))
+  dir(package_directory)
 end
 
 installed_packages() # List all packages installed on the system.
@@ -139,6 +150,13 @@ function install_package(package_name)
   tarball_location = download_package(url)
   
   store_package(package_name, tarball_location)
+  
+  # Build external code.
+  build_file = file_path(path_expand("~/.julia/packages"), package_name, "build.jl")
+  if file_exists(build_file)
+    # Run build operations.
+    load(build_file)
+  end
   
   println("Successfully installed $package_name")
 end
